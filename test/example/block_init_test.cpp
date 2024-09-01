@@ -11,6 +11,8 @@ const static uint32_t bucket_size = 1000;   //哈希桶大小
 
 int32_t block_id = 1;
 
+int directory_exists(const char *path);
+
 const static int32_t debug = 1;
 
 int main(int argc, char* argv[]) {
@@ -24,6 +26,15 @@ int main(int argc, char* argv[]) {
     tmp_stream << "." << largefile::MAINBLOCK_DIR_PREFIX << block_id;
     tmp_stream >> mainblock_path;
 
+    // 检查目录是否存在
+    if (!directory_exists("./mainblock")) {
+        // 创建目录
+        if (mkdir("./mainblock", 0755) == -1) {
+            perror("mkdir");
+            return 1;
+        }
+    }
+
     largefile::FileOperation* mainblock = new largefile::FileOperation(mainblock_path, O_CREAT | O_RDWR | O_LARGEFILE);
 
     int32_t ret = mainblock->ftruncate_file(main_blocksize);
@@ -35,6 +46,15 @@ int main(int argc, char* argv[]) {
     }
 
     //2.生成索引文件
+    // 检查目录是否存在
+    if (!directory_exists("index")) {
+        // 创建目录
+        if (mkdir("index", 0755) == -1) {
+            perror("mkdir");
+            return 1;
+        }
+    }
+    
     largefile::IndexHanle* index_handle = new largefile::IndexHanle(".", block_id); //索引文件句柄
 
     if(debug) printf("Init index...\n");
@@ -58,4 +78,17 @@ int main(int argc, char* argv[]) {
     delete index_handle;
 
     return 0;
+}
+
+// 检查目录是否存在
+int directory_exists(const char *path) {
+    struct stat info;
+
+    if (stat(path, &info) != 0) {
+        return 0;  // 目录不存在
+    } else if (info.st_mode & S_IFDIR) {
+        return 1;  // 是目录
+    } else {
+        return 0;  // 不是目录
+    }
 }
