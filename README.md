@@ -31,4 +31,16 @@
   1. 生成 MetaInfo 信息（包括文件在块中的fd）
   2. 将 MetaInfo 写入索引文件
   3. 更新块信息 BlockInfo
+### 编译
+1. `mkdir bl`
+2. `cd bl`
+3. `cmake ..`
+4. `make`
+### 运行
+1. bin 目录下可执行文件：
+2. `./test_init 1`
+3. `./test_write 1`
+4. `./test_read 1 1`
+5. `./test_del 1`
+
   
